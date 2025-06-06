@@ -1,0 +1,30 @@
+{
+    "name": "ecommerce-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "ts-node-dev --respawn --transpile-only server.ts",
+        "prisma:generate": "prisma generate --schema=src/config/prisma/schema.prisma",
+        "prisma:migrate": "prisma migrate dev --schema=src/config/prisma/schema.prisma",
+        "prisma:studio": "prisma studio --schema=src/config/prisma/schema.prisma"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@prisma/client": "6.8.2",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "nodemon": "^3.1.10",
+        "zod": "^3.25.55"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.2",
+        "@types/node": "^22.15.29",
+        "prettier": "^3.5.3",
+        "prisma": "^6.8.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.8.3"
+    }
+}
