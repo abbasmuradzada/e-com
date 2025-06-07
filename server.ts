@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import dotenv from 'dotenv';
-import userRoutes from './src/modules/user/user.routes';
+import { userRouter } from './src/modules/user/user.routes';
+import { errorHandler } from './src/common/middlewares/errors';
 
 dotenv.config();
 
@@ -8,8 +9,8 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
-
-app.use('/api/users', userRoutes);
+app.use('/api/users', userRouter);
+app.use(errorHandler);
 
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK' });

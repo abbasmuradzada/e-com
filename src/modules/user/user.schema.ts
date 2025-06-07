@@ -1,8 +1,18 @@
 import { z } from 'zod';
 
-export const createUserSchema = z.object({
+export const registerSchema = z.object({
     email: z.string().email(),
-    name: z.string().min(1).optional(),
+    passwordHash: z.string().min(6),
+    name: z.string().optional(),
 });
 
-export type createUserSchemaDto = z.infer<typeof createUserSchema>;
+export const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+});
+
+export type RegisterSchemaDto = z.infer<typeof registerSchema>;
+export type LoginSchemaDto = z.infer<typeof loginSchema>;
+
+export const validateRegisterInput = (input: RegisterSchemaDto) => registerSchema.parse(input);
+export const validateLoginInput = (input: LoginSchemaDto) => loginSchema.parse(input);

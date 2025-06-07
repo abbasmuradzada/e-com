@@ -1,10 +1,25 @@
 import { prisma } from '../../config/prisma/client';
-import { createUserSchemaDto } from './user.schema';
+import { RegisterSchemaDto } from './user.schema';
+import { User } from '@prisma/client';
 
-export const getAllUsers = () => prisma.user.findMany();
+export class UserRepository {
+    async findAll(): Promise<User[]> {
+        return prisma.user.findMany();
+    }
 
-export const getUserById = (id: string) => prisma.user.findUnique({ where: { id } });
+    async findById(id: string): Promise<User | null> {
+        return prisma.user.findUnique({ where: { id } });
+    }
 
-export const createUser = (data: createUserSchemaDto) => prisma.user.create({ data });
+    async create(data: RegisterSchemaDto): Promise<User> {
+        return prisma.user.create({ data });
+    }
 
-export const deleteUser = (id: string) => prisma.user.delete({ where: { id } });
+    async delete(id: string): Promise<void> {
+        await prisma.user.delete({ where: { id } });
+    }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return prisma.user.findUnique({ where: { email } });
+    }
+}

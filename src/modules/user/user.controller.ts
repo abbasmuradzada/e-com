@@ -1,40 +1,50 @@
 import { Request, Response } from 'express';
-import * as userService from './user.service';
-import { createUserSchemaDto } from './user.schema';
-import { GetAllUsersResponse, GetUserByIdResponse, UserResponse } from './user.types';
+import { UserService } from './user.service';
+import { validateRegisterInput, validateLoginInput } from './user.schema';
+import { UserResponse } from './user.types';
+import { ApiResponse } from '../../common/types/shared';
+import { AppError } from '../../common/errors/shared';
 
-export const getAllUsers = async (
-    _req: Request,
-    res: Response<GetAllUsersResponse>,
-): Promise<void> => {
-    const users = await userService.getAllUsers();
-    res.json(users);
-};
+export class UserController {
+    constructor(private readonly userService: UserService) {}
 
-export const getUserById = async (
-    req: Request<{ id: string }>,
-    res: Response<GetUserByIdResponse>,
-): Promise<void> => {
-    const user = await userService.getUserById(req.params.id);
-    if (!user) {
-        res.status(404).json({ message: 'User not found' });
-        return;
+    async register(req: Request, res: Response<ApiResponse<UserResponse>>) {
+        const validatedData = validateRegisterInput({
+            email: req.body.email,
+            passwordHash: req.body.password,
+            name: req.body.name,
+        });
+
+        const { user, token } = await this.userService.register({
+            email: validatedData.email,
+            password: req.body.password,
+            name: validatedData.name,
+        });
+
+        res.status(201).json({
+            success: true,
+            data: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                token,
+            },
+        });
     }
-    res.json(user);
-};
 
-export const createUser = async (
-    req: Request<{}, {}, createUserSchemaDto>,
-    res: Response<UserResponse>,
-): Promise<void> => {
-    const user = await userService.createUser(req.body);
-    res.status(201).json(user);
-};
+    async login(req: Request, res: Response<ApiResponse<UserResponse>>) {
+        const validatedData = validateLoginInput(req.body);
 
-export const deleteUser = async (
-    req: Request<{ id: string }>,
-    res: Response<void>,
-): Promise<void> => {
-    await userService.deleteUser(req.params.id);
-    res.status(204).send();
-};
+        const { user, token } = await this.userService.login(validatedData);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                token,
+            },
+        });
+    }
+}

@@ -1,11 +1,14 @@
 import { Router } from 'express';
-import * as userController from './user.controller';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
+import { UserRepository } from './user.repository';
 
-const router = Router();
+const userRouter = Router();
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
+const userController = new UserController(userService);
 
-router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUserById);
-router.post('/', userController.createUser);
-router.delete('/:id', userController.deleteUser);
+userRouter.post('/register', userController.register.bind(userController));
+userRouter.post('/login', userController.login.bind(userController));
 
-export default router;
+export { userRouter };
