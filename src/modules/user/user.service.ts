@@ -1,5 +1,10 @@
 import { UserRepository } from './user.repository';
-import { RegisterSchemaDto, LoginSchemaDto } from './user.schema';
+import {
+    RegisterSchemaDto,
+    LoginSchemaDto,
+    validateGoogleProfileInput,
+    GoogleProfileSchemaDto,
+} from './user.schema';
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -37,6 +42,24 @@ export class UserService {
         const isValidPassword = await bcrypt.compare(data.password, user.passwordHash);
         if (!isValidPassword) {
             throw new UnauthorizedError();
+        }
+
+        const token = this.generateToken(user.id);
+
+        return { user, token };
+    }
+
+    async loginWithGoogle(profile: GoogleProfileSchemaDto): Promise<{ user: User; token: string }> {
+        const validatedProfile = validateGoogleProfileInput(profile);
+
+        let user = await this.userRepository.findByEmail(validatedProfile.email);
+
+        if (!user) {
+            user = await this.userRepository.create({
+                email: validatedProfile.email,
+                name: validatedProfile.name || '',
+                passwordHash: '',
+            });
         }
 
         const token = this.generateToken(user.id);

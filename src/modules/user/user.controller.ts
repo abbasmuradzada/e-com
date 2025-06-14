@@ -3,7 +3,8 @@ import { UserService } from './user.service';
 import { validateRegisterInput, validateLoginInput } from './user.schema';
 import { UserResponse } from './user.types';
 import { ApiResponse } from '../../common/types/shared';
-import { AppError } from '../../common/errors/shared';
+import { User } from '@prisma/client';
+import { UnauthorizedError } from '../../common/errors/shared';
 
 export class UserController {
     constructor(private readonly userService: UserService) {}
@@ -46,5 +47,35 @@ export class UserController {
                 token,
             },
         });
+    }
+
+    async googleAuthSuccess(req: Request, res: Response) {
+        const user = req.user as User | undefined;
+        if (!user) {
+            return res.redirect('/users/failure');
+        }
+
+        const { email, name } = user;
+
+        const { user: finalUser, token } = await this.userService.loginWithGoogle({
+            email,
+            name,
+        });
+
+        const response: UserResponse = {
+            id: finalUser.id,
+            email: finalUser.email,
+            name: finalUser.name || null,
+            token,
+        };
+
+        // --- fixit (redirect to origin url)
+        res.redirect(
+            `http://localhost:3000/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(response))}`,
+        );
+    }
+
+    googleAuthFailure(_req: Request, _res: Response) {
+        throw new UnauthorizedError('Google authentication failed');
     }
 }

@@ -22,4 +22,19 @@ export class UserRepository {
     async findByEmail(email: string): Promise<User | null> {
         return prisma.user.findUnique({ where: { email } });
     }
+
+    async findByGoogleId(googleId: string): Promise<User | null> {
+        return prisma.user.findUnique({ where: { googleId } });
+    }
+
+    async updateUser(
+        id: string,
+        data: Partial<{
+            googleId: string;
+            isEmailVerified: boolean;
+            name: string;
+        }>,
+    ): Promise<User> {
+        return prisma.user.update({ where: { id }, data });
+    }
 }
