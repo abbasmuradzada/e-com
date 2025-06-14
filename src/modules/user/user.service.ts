@@ -1,14 +1,10 @@
 import { UserRepository } from './user.repository';
-import {
-    RegisterSchemaDto,
-    LoginSchemaDto,
-    validateGoogleProfileInput,
-    GoogleProfileSchemaDto,
-} from './user.schema';
+import { RegisterSchemaDto, LoginSchemaDto, GoogleProfileSchemaDto } from './user.schema';
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ConflictError, UnauthorizedError } from '../../common/errors/shared';
+import { emailService } from '../../common/email/email.service';
 
 export class UserService {
     constructor(private readonly userRepository: UserRepository) {}
@@ -50,16 +46,27 @@ export class UserService {
     }
 
     async loginWithGoogle(profile: GoogleProfileSchemaDto): Promise<{ user: User; token: string }> {
-        const validatedProfile = validateGoogleProfileInput(profile);
+        const email = profile.emails?.[0].value;
 
-        let user = await this.userRepository.findByEmail(validatedProfile.email);
+        let user = await this.userRepository.findByGoogleId(profile.id);
 
         if (!user) {
-            user = await this.userRepository.create({
-                email: validatedProfile.email,
-                name: validatedProfile.name || '',
-                passwordHash: '',
-            });
+            user = await this.userRepository.findByEmail(email);
+            if (user) {
+                user = await this.userRepository.updateUser(user.id, {
+                    googleId: profile.id,
+                    isEmailVerified: true,
+                });
+            } else {
+                user = await this.userRepository.create({
+                    email,
+                    name: profile.displayName,
+                    googleId: profile.id,
+                    passwordHash: '',
+                    isEmailVerified: true,
+                });
+                await emailService.sendWelcomeEmail(email, profile.displayName);
+            }
         }
 
         const token = this.generateToken(user.id);

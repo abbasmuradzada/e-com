@@ -13,9 +13,15 @@ export const loginSchema = z.object({
     password: z.string().min(6),
 });
 
+export const googleEmailSchema = z.object({
+    value: z.string(),
+    verified: z.boolean(),
+});
+
 export const googleProfileSchema = z.object({
-    email: z.string().email(),
-    name: z.string().nullable().optional(),
+    emails: z.array(googleEmailSchema),
+    displayName: z.string(),
+    id: z.string(),
 });
 
 export type RegisterSchemaDto = z.infer<typeof registerSchema>;

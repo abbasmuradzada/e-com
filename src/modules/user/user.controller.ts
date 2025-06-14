@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
-import { validateRegisterInput, validateLoginInput } from './user.schema';
+import { validateRegisterInput, validateLoginInput, GoogleProfileSchemaDto } from './user.schema';
 import { UserResponse } from './user.types';
 import { ApiResponse } from '../../common/types/shared';
-import { User } from '@prisma/client';
 import { UnauthorizedError } from '../../common/errors/shared';
 
 export class UserController {
@@ -49,23 +48,19 @@ export class UserController {
         });
     }
 
-    async googleAuthSuccess(req: Request, res: Response) {
-        const user = req.user as User | undefined;
-        if (!user) {
+    async googleAuthSuccess(req: Request, res: Response<ApiResponse<UserResponse>>) {
+        const profile = req.user as GoogleProfileSchemaDto | undefined;
+
+        if (!profile) {
             return res.redirect('/users/failure');
         }
 
-        const { email, name } = user;
-
-        const { user: finalUser, token } = await this.userService.loginWithGoogle({
-            email,
-            name,
-        });
+        const { user, token } = await this.userService.loginWithGoogle(profile);
 
         const response: UserResponse = {
-            id: finalUser.id,
-            email: finalUser.email,
-            name: finalUser.name || null,
+            id: user.id,
+            email: user.email,
+            name: user.name || null,
             token,
         };
 

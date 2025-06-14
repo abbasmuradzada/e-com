@@ -1,11 +1,13 @@
-import express, { ErrorRequestHandler } from 'express';
 import dotenv from 'dotenv';
+dotenv.config()
+import express, { ErrorRequestHandler } from 'express';
 import { userRouter } from './src/modules/user/user.routes';
 import { errorHandler } from './src/common/middlewares/errors';
 import session from 'express-session';
 import passport from 'passport';
 import './src/config/passport';
-dotenv.config();
+
+;
 
 const app = express();
 const PORT = process.env.PORT || 8000;
