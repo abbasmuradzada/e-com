@@ -1,13 +1,14 @@
 import dotenv from 'dotenv';
-dotenv.config()
+dotenv.config();
 import express, { ErrorRequestHandler } from 'express';
 import { userRouter } from './src/modules/user/user.routes';
+import { productRouter } from './src/modules/product/product.routes';
 import { errorHandler } from './src/common/middlewares/errors';
 import session from 'express-session';
 import passport from 'passport';
 import './src/config/passport';
-
-;
+import { categoryRouter } from './src/modules/category/category.routes';
+import { subCategoryRouter } from './src/modules/sub-category/sub-category.routes';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -30,6 +31,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api/users', userRouter);
+app.use('/api/product', productRouter);
+app.use('/api/category', categoryRouter);
+app.use('/api/sub-category', subCategoryRouter);
 app.use(errorHandler);
 
 app.get('/api/health', (_req, res) => {

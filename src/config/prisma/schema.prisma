@@ -24,3 +24,38 @@ enum Role {
   ADMIN
   MODERATOR
 }
+
+model Category {
+  id            String         @id @default(cuid())
+  name          String
+  description   String
+  createdAt     DateTime       @default(now())
+  deletedAt     DateTime?
+
+  subCategories SubCategory[]  // 1:n relation
+}
+
+model SubCategory {
+  id           String         @id @default(cuid())
+  parentId     String
+  name         String
+  description  String
+  createdAt    DateTime       @default(now())
+  deletedAt    DateTime?
+
+  category     Category       @relation(fields: [parentId], references: [id])
+  products     Product[]      // 1:n relation
+}
+
+model Product {
+  id           String         @id @default(cuid())
+  name         String
+  description  String
+  summary      String
+  cover        String
+  categoryId   String
+  createdAt    DateTime       @default(now())
+  deletedAt    DateTime?
+
+  subCategory  SubCategory    @relation(fields: [categoryId], references: [id])
+}
