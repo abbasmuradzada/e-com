@@ -2,13 +2,14 @@ import { Router } from 'express';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { ProductRepository } from './product.repository';
+import { authMiddleware } from '../../common/middlewares/auth.middleware';
 
 const productRouter = Router();
 const productRepository = new ProductRepository();
 const productService = new ProductService(productRepository);
 const productController = new ProductController(productService);
 
-productRouter.post('/', productController.create.bind(productController));
+productRouter.post('/', authMiddleware, productController.create.bind(productController));
 productRouter.patch('/:id', productController.update.bind(productController));
 productRouter.delete('/:id', productController.remove.bind(productController));
 productRouter.get('/', productController.findAll.bind(productController));

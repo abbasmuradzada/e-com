@@ -3,7 +3,7 @@ dotenv.config();
 import express, { ErrorRequestHandler } from 'express';
 import { userRouter } from './src/modules/user/user.routes';
 import { productRouter } from './src/modules/product/product.routes';
-import { errorHandler } from './src/common/middlewares/errors';
+import { errorsMiddleware } from './src/common/middlewares/errors.middleware';
 import session from 'express-session';
 import passport from 'passport';
 import './src/config/passport';
@@ -34,7 +34,7 @@ app.use('/api/users', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/sub-category', subCategoryRouter);
-app.use(errorHandler);
+app.use(errorsMiddleware);
 
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK' });

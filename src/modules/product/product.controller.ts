@@ -3,6 +3,7 @@ import { ProductService } from './product.service';
 import { ApiResponse } from '../../common/types/shared';
 import { ProductResponse } from './product.types';
 import { NotFoundError } from '../../common/errors/shared';
+import { AuthenticatedRequest } from '../../common/middlewares/auth.middleware';
 
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
