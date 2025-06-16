@@ -1,39 +1,42 @@
 import { Request, Response } from 'express';
 import { ProductService } from './product.service';
+import { ApiResponse } from '../../common/types/shared';
+import { ProductResponse } from './product.types';
+import { NotFoundError } from '../../common/errors/shared';
 
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response<ApiResponse<ProductResponse>>) {
         const product = await this.productService.create(req.body);
-        res.status(201).json(product);
+        res.status(201).json({ success: true, ...product });
     }
 
-    async findAll(_req: Request, res: Response) {
+    async findAll(_req: Request, res: Response<ApiResponse<ProductResponse>>) {
         const products = await this.productService.findAll();
-        res.json(products);
+        res.json({ success: true, ...products });
     }
 
-    async findOne(req: Request, res: Response) {
+    async findOne(req: Request, res: Response<ApiResponse<ProductResponse>>) {
         const product = await this.productService.findOne(req.params.id);
         if (!product) {
-            res.status(404).json({ message: 'Product not found' });
+            throw new NotFoundError('Product not found');
         }
-        res.json(product);
+        res.json({ success: true, ...product });
     }
 
-    async update(req: Request, res: Response) {
+    async update(req: Request, res: Response<ApiResponse<ProductResponse>>) {
         const product = await this.productService.update(req.params.id, req.body);
-        res.json(product);
+        res.json({ success: true, ...product });
     }
 
-    async remove(req: Request, res: Response) {
+    async remove(req: Request, res: Response<ApiResponse<ProductResponse>>) {
         await this.productService.remove(req.params.id);
         res.status(204).send();
     }
 
-    async findByCategory(req: Request, res: Response) {
+    async findByCategory(req: Request, res: Response<ApiResponse<ProductResponse>>) {
         const products = await this.productService.findByCategoryId(req.params.categoryId);
-        res.json(products);
+        res.json({ success: true, ...products });
     }
 }

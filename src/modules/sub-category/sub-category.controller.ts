@@ -1,39 +1,42 @@
 import { Request, Response } from 'express';
 import { SubCategoryService } from './sub-category.service';
+import { ApiResponse } from '../../common/types/shared';
+import { SubCategoryResponse } from './sub-category.types';
+import { NotFoundError } from '../../common/errors/shared';
 
 export class SubCategoryController {
     constructor(private readonly subCategoryService: SubCategoryService) {}
 
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response<ApiResponse<SubCategoryResponse>>) {
         const subCategory = await this.subCategoryService.create(req.body);
-        res.status(201).json(subCategory);
+        res.status(201).json({ success: true, ...subCategory });
     }
 
-    async findAll(_req: Request, res: Response) {
+    async findAll(_req: Request, res: Response<ApiResponse<SubCategoryResponse>>) {
         const subCategories = await this.subCategoryService.findAll();
-        res.json(subCategories);
+        res.json({ success: true, ...subCategories });
     }
 
-    async findOne(req: Request, res: Response) {
+    async findOne(req: Request, res: Response<ApiResponse<SubCategoryResponse>>) {
         const subCategory = await this.subCategoryService.findOne(req.params.id);
         if (!subCategory) {
-            res.status(404).json({ message: 'Sub-category not found' });
+            throw new NotFoundError('Sub-category not found');
         }
-        res.json(subCategory);
+        res.json({ success: true, ...subCategory });
     }
 
-    async update(req: Request, res: Response) {
+    async update(req: Request, res: Response<ApiResponse<SubCategoryResponse>>) {
         const subCategory = await this.subCategoryService.update(req.params.id, req.body);
-        res.json(subCategory);
+        res.json({ success: true, ...subCategory });
     }
 
-    async remove(req: Request, res: Response) {
+    async remove(req: Request, res: Response<ApiResponse<SubCategoryResponse>>) {
         await this.subCategoryService.remove(req.params.id);
         res.status(204).send();
     }
 
-    async findByCategory(req: Request, res: Response) {
+    async findByCategory(req: Request, res: Response<ApiResponse<SubCategoryResponse>>) {
         const subCategories = await this.subCategoryService.findByCategoryId(req.params.categoryId);
-        res.json(subCategories);
+        res.json({ success: true, ...subCategories });
     }
 }
