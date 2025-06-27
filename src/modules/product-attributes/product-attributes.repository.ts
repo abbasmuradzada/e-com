@@ -6,4 +6,8 @@ export class ProductAttributesRepository {
     async create(data: CreateProductAttributeDto): Promise<ProductAttributes> {
         return prisma.productAttributes.create({ data });
     }
+
+    async getById(id: string): Promise<ProductAttributes | null> {
+        return prisma.productAttributes.findUnique({ where: { id } });
+    }
 }

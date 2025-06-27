@@ -10,6 +10,7 @@ import './src/config/passport';
 import { categoryRouter } from './src/modules/category/category.routes';
 import { subCategoryRouter } from './src/modules/sub-category/sub-category.routes';
 import { productAttributesRouter } from './src/modules/product-attributes/product-attributes.routes';
+import { productSkuRouter } from './src/modules/product-sku/product-sku.routes';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -34,6 +35,7 @@ app.use(passport.session());
 app.use('/api/users', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/product-attributes', productAttributesRouter);
+app.use('/api/product-sku', productSkuRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/sub-category', subCategoryRouter);
 app.use(errorsMiddleware);
