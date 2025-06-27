@@ -48,14 +48,49 @@ model SubCategory {
 }
 
 model Product {
-  id           String         @id @default(cuid())
+  id           String        @id @default(cuid())
   name         String
   description  String
   summary      String
   cover        String
   categoryId   String
-  createdAt    DateTime       @default(now())
+  createdAt    DateTime      @default(now())
   deletedAt    DateTime?
 
-  subCategory  SubCategory    @relation(fields: [categoryId], references: [id])
+  subCategory  SubCategory   @relation(fields: [categoryId], references: [id])
+  productSkus  ProductSkus[]
+}
+
+model ProductAttributes {
+  id            String         @id @default(cuid())
+  type          ProductAttributeTypes
+  value         String
+  createdAt     DateTime       @default(now())
+  deletedAt     DateTime?
+
+  sizeSkus      ProductSkus[]  @relation("SizeAttribute")
+  colorSkus     ProductSkus[]  @relation("ColorAttribute")
+}
+
+enum ProductAttributeTypes {
+  COLOR
+  SIZE
+}
+
+model ProductSkus {
+  id                String             @id @default(cuid())
+  productId         String
+  sizeAttributeId   String
+  colorAttributeId  String
+  sku               String             @unique
+  price             Decimal            @db.Decimal(10, 2)
+  quantity          Int
+  createdAt         DateTime           @default(now())
+  deletedAt         DateTime?
+
+  product           Product            @relation(fields: [productId], references: [id])
+  sizeAttribute     ProductAttributes  @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
+  colorAttribute    ProductAttributes  @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
+
+  @@unique([productId, sizeAttributeId, colorAttributeId])
 }
