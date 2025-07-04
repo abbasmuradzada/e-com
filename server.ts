@@ -11,6 +11,8 @@ import { categoryRouter } from './src/modules/category/category.routes';
 import { subCategoryRouter } from './src/modules/sub-category/sub-category.routes';
 import { productAttributesRouter } from './src/modules/product-attributes/product-attributes.routes';
 import { productSkuRouter } from './src/modules/product-sku/product-sku.routes';
+import { cartRouter } from './src/modules/cart/cart.routes';
+import { orderRouter } from './src/modules/order/order.routes';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -38,6 +40,8 @@ app.use('/api/product-attributes', productAttributesRouter);
 app.use('/api/product-sku', productSkuRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/sub-category', subCategoryRouter);
+app.use('/api/cart-item', cartRouter);
+app.use('/api/order', orderRouter);
 app.use(errorsMiddleware);
 
 app.get('/api/health', (_req, res) => {
